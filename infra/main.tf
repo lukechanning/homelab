@@ -36,3 +36,7 @@ provider "kubernetes" {
 module "metallb-module" {
     source = "./metallb"
 }
+
+module "longhorn-module" {
+    source = "./longhorn"
+}
