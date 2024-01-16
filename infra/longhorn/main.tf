@@ -9,37 +9,54 @@ resource "kubernetes_namespace" "longhorn-system" {
   }
 }
 
-# resource "kubernetes_manifest" "longhorn-networking" {
-#   manifest = {
-#     apiVersion = "traefik.containo.us/v1alpha1"
-#     kind       = "IngressRoute"
+# define the longhorn-frontend-ui service to use with ingress
+resource "kubernetes_service" "longhorn-frontend-ui" {
+  metadata {
+    name = "longhorn-frontend-ui"
+    namespace = "longhorn-system"
+  }
+  spec {
+    selector = {
+      app = "longhorn-ui" 
+    }
+    port {
+      port = 80
+      # target_port = 80
+    }
+  }
+}
 
-#     metadata = {
-#       name      = "longhorn-ui"
-#       namespace = "longhorn-system"
-#     }
+resource "kubernetes_manifest" "longhorn-networking" {
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind       = "IngressRoute"
 
-#     spec = { 
-#       entryPoints = [
-#         "web"
-#       ]
+    metadata = {
+      name      = "longhorn-ui"
+      namespace = "longhorn-system"
+    }
 
-#       routes = [
-#         {
-#           match = "Host(`longhorn`)"
-#           kind = "Rule"
-#           services = [
-#             {
-#               kind = "Service"
-#               name = "longhorn-frontend"
-#               port = 80
-#             }
-#           ]
-#         }
-#       ]
-#     }
-#   }
-# }
+    spec = { 
+      entryPoints = [
+        "web"
+      ]
+
+      routes = [
+        {
+          match = "Host(`longhorn`)"
+          kind = "Rule"
+          services = [
+            {
+              name = "longhorn-frontend-ui"
+              namespace = "longhorn-system"
+              port = 80
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
 
 resource "helm_release" "longhorn" {
   name       = "longhorn"
