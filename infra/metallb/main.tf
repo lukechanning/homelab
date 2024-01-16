@@ -4,13 +4,22 @@ resource "kubernetes_namespace" "metallb-system" {
   }
 }
 
-resource "kubernetes_config_map" "metallb-config" {
-  metadata {
-    name = "metallb-config"
-    namespace = "metallb-system"
-  }
-  data = {
-    "config.yml" = "${file("${path.module}/config.yml")}"
+# import custom resource to defin IP range for metallb
+resource "kubernetes_manifest" "metallb-config" {
+  manifest = { 
+    apiVersion  = "metallb.io/v1beta1"
+    kind        = "IPAddressPool"
+
+    metadata = {
+      name      = "first-pool"
+      namespace = "metallb-system"
+    }
+
+    spec = {
+      addresses = [
+        "192.168.1.10-192.168.1.50"
+      ]
+    }
   }
 }
 
