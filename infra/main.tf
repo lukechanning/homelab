@@ -34,11 +34,11 @@ provider "kubernetes" {
 # MODULES #
 ###########
 module "metallb-module" {
-    source = "./metallb"
+    source = "./modules/metallb"
 }
 
 module "longhorn-module" {
-    source = "./longhorn"
+    source = "./modules/longhorn"
 }
 
 module "pihole-module" {

@@ -1,28 +1,10 @@
 ## FOR THIS TO WORK: #################################
 ## 1. Each node must have open-iscsi installed #######
-## 2. Helm chart must be added locally - see:  #######
-## helm repo add longhorn https://charts.longhorn.io #
+## $ sudo apt install open-iscsi #####################
 ######################################################
 resource "kubernetes_namespace" "longhorn-system" {
   metadata {
     name = "longhorn-system"
-  }
-}
-
-# define the longhorn-frontend-ui service to use with ingress
-resource "kubernetes_service" "longhorn-frontend-ui" {
-  metadata {
-    name = "longhorn-frontend-ui"
-    namespace = "longhorn-system"
-  }
-  spec {
-    selector = {
-      app = "longhorn-ui" 
-    }
-    port {
-      port = 80
-      # target_port = 80
-    }
   }
 }
 
@@ -47,7 +29,7 @@ resource "kubernetes_manifest" "longhorn-networking" {
           kind = "Rule"
           services = [
             {
-              name = "longhorn-frontend-ui"
+              name = "longhorn-frontend"
               namespace = "longhorn-system"
               port = 80
             }
@@ -61,6 +43,7 @@ resource "kubernetes_manifest" "longhorn-networking" {
 resource "helm_release" "longhorn" {
   name       = "longhorn"
   namespace  = "longhorn-system"
-  chart      = "longhorn/longhorn"
+  repository = "https://charts.longhorn.io"
+  chart      = "longhorn"
   version    = "1.5.3"
 }
