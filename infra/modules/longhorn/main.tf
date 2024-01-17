@@ -8,23 +8,6 @@ resource "kubernetes_namespace" "longhorn-system" {
   }
 }
 
-# define the longhorn-frontend-ui service to use with ingress
-resource "kubernetes_service" "longhorn-frontend-ui" {
-  metadata {
-    name = "longhorn-frontend-ui"
-    namespace = "longhorn-system"
-  }
-  spec {
-    selector = {
-      app = "longhorn-ui" 
-    }
-    port {
-      port = 80
-      # target_port = 80
-    }
-  }
-}
-
 resource "kubernetes_manifest" "longhorn-networking" {
   manifest = {
     apiVersion = "traefik.containo.us/v1alpha1"
@@ -46,7 +29,7 @@ resource "kubernetes_manifest" "longhorn-networking" {
           kind = "Rule"
           services = [
             {
-              name = "longhorn-frontend-ui"
+              name = "longhorn-frontend"
               namespace = "longhorn-system"
               port = 80
             }
