@@ -38,7 +38,7 @@ module "metallb-module" {
 }
 
 module "longhorn-module" {
-    source = "./longhorn"
+    source = "./modules/longhorn"
 }
 
 module "pihole-module" {

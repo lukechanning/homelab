@@ -1,7 +1,6 @@
 ## FOR THIS TO WORK: #################################
 ## 1. Each node must have open-iscsi installed #######
-## 2. Helm chart must be added locally - see:  #######
-## helm repo add longhorn https://charts.longhorn.io #
+## $ sudo apt install open-iscsi #####################
 ######################################################
 resource "kubernetes_namespace" "longhorn-system" {
   metadata {
@@ -61,6 +60,7 @@ resource "kubernetes_manifest" "longhorn-networking" {
 resource "helm_release" "longhorn" {
   name       = "longhorn"
   namespace  = "longhorn-system"
-  chart      = "longhorn/longhorn"
+  repository = "https://charts.longhorn.io"
+  chart      = "longhorn"
   version    = "1.5.3"
 }
