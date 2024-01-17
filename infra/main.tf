@@ -34,7 +34,7 @@ provider "kubernetes" {
 # MODULES #
 ###########
 module "metallb-module" {
-    source = "./metallb"
+    source = "./modules/metallb"
 }
 
 module "longhorn-module" {
