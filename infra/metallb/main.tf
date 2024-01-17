@@ -23,6 +23,23 @@ resource "kubernetes_manifest" "metallb-config" {
   }
 }
 
+# define announcement protocol for metallb
+resource "kubernetes_manifest" "metallb-config-protocol" {
+  manifest = { 
+    apiVersion  = "metallb.io/v1beta1"
+    kind        = "L2Advertisement"
+
+    metadata = {
+      name      = "metallb-l2-config"
+      namespace = "metallb-system"
+    }
+
+    spec = {
+      ipAddressPools = ["first-pool"] 
+    }
+  }
+}
+
 resource "helm_release" "metallb" {
   name       = "metallb"
   namespace  = "metallb-system"
