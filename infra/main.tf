@@ -44,3 +44,7 @@ module "longhorn-module" {
 module "pihole-module" {
     source = "./modules/pihole"
 }
+
+module "cloudflare-module" {
+    source = "./modules/cloudflare"
+}
