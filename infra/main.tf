@@ -48,3 +48,7 @@ module "pihole-module" {
 module "cloudflare-module" {
     source = "./modules/cloudflare"
 }
+
+module "wireguard-module" {
+    source = "./modules/wireguard"
+}

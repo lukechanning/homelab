@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wireguard
+  namespace: wireguard
+type: Opaque
+stringData:
+  wg0.conf.template: |
+    [Interface]
+    Address = 10.41.1.1/24
+    ListenPort = 51820
+    PrivateKey = mLNVWjpoynxJooivVnjlI/lkCJ2Xv0XhFeIA6jpRp2g=
+    PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    PostUp = sysctl -w -q net.ipv4.ip_forward=1
+    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+    PostDown = sysctl -w -q net.ipv4.ip_forward=0
+    DNS = 192.168.1.15
+
+    [Peer]
+    PublicKey = PbZiUWKa+2q4jd7uYsEZtjDUZXJVspocsaHemA7G8B4= 
+    AllowedIPs = 0.0.0.0/0 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: 
+    meta.helm.sh/release-name: wireguard
+  labels:
+  name: wireguard
+  namespace: wireguard
+spec:
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      containers:
+      - env:
+        - name: PEERS
+          value: user1,user2
+        - name: PUID
+          value: '1000'
+        - name: PGID
+          value: '1000'
+        - name: ALLOWEDIPS
+          value: 0.0.0.0/0
+        image: linuxserver/wireguard:latest
+        name: wireguard
+        ports:
+        - containerPort: 51820
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_MODULE
+          privileged: true
+        volumeMounts:
+        - mountPath: "/config/"
+          name: wireguard-config
+      imagePullSecrets:
+      - name: docker-registry
+      initContainers:
+      - command:
+        - sh
+        - "-c"
+        - sed /etc/wireguard-secret/wg0.conf.template > /config/wg0.conf; chmod 400 /config/wg0.conf
+        - sysctl -w net.ipv4.ip_forward=1
+        image: busybox
+        name: wireguard-template-replacement
+        volumeMounts:
+        - mountPath: "/config/"
+          name: wireguard-config
+        - mountPath: "/etc/wireguard-secret/"
+          name: wireguard-secret
+      volumes:
+      - emptyDir: {}
+        name: wireguard-config
+      - name: wireguard-secret
+        secret:
+          secretName: wireguard
