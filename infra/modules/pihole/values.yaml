@@ -1,5 +1,8 @@
 adminPassword: "alleged pihole beret"
 
+DNS1: "1.1.1.1" 
+DNS2: "1.0.0.1" 
+
 serviceWeb:
   loadBalancerIP: 192.168.1.16
   type: LoadBalancer
@@ -13,10 +16,3 @@ serviceDns:
 persistentVolumeClaim:
   enabled: true
   storageClass: "longhorn"
-
-# podDnsConfig:
-#   enabled: true
-#   policy: "None"
-#   nameservers:
-#   - 1.1.1.1
-#   - 1.0.0.1
