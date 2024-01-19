@@ -5,12 +5,15 @@ DNS2: "1.0.0.1"
 
 serviceWeb:
   loadBalancerIP: 192.168.1.16
+  annotations:
+    tailscale.com/expose: "true"
   type: LoadBalancer
 
 serviceDns:
   loadBalancerIP: 192.168.1.15
   annotations:
     metallb.universe.tf/allow-shared-ip: "192.168.1.15"
+    tailscale.com/expose: "true"
   type: LoadBalancer
 
 persistentVolumeClaim:
