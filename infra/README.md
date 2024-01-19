@@ -20,3 +20,41 @@ A number of locally defined variables are required to make everything work toget
 We need a few packages, sadly, to make everything work. Be sure to run this on each node:
 
 `sudo apt install open-iscsi`
+
+## Tunneling Services:
+
+Sometimes you need to expose a service to the broader world. Tailscale makes this pretty straightforward. Here's an example of doing it with a sample Ingress for the Pi-hole service: 
+
+```
+resource "kubernetes_manifest" "ingress_pihole_web" {
+  manifest = {
+    "apiVersion" = "networking.k8s.io/v1"
+    "kind" = "Ingress"
+    "metadata" = {
+      "annotations" = {
+        "tailscale.com/funnel" = "true"
+      }
+      "name" = "pihole-web"
+      "namespace" = "pihole-cloud"
+    }
+    "spec" = {
+      "defaultBackend" = {
+        "service" = {
+          "name" = "pihole-web"
+          "port" = {
+            "number" = 80
+          }
+        }
+      }
+      "ingressClassName" = "tailscale"
+      "tls" = [
+        {
+          "hosts" = [
+            "pihole-web",
+          ]
+        },
+      ]
+    }
+  }
+}
+```

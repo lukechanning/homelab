@@ -4,40 +4,6 @@ resource "kubernetes_namespace" "pihole-cloud" {
   }
 }
 
-# define the Tailscale ingress for funnel
-resource "kubernetes_manifest" "ingress_pihole_web" {
-  manifest = {
-    "apiVersion" = "networking.k8s.io/v1"
-    "kind" = "Ingress"
-    "metadata" = {
-      "annotations" = {
-        "tailscale.com/funnel" = "true"
-      }
-      "name" = "pihole-web"
-      "namespace" = "pihole-cloud"
-    }
-    "spec" = {
-      "defaultBackend" = {
-        "service" = {
-          "name" = "pihole-web"
-          "port" = {
-            "number" = 80
-          }
-        }
-      }
-      "ingressClassName" = "tailscale"
-      "tls" = [
-        {
-          "hosts" = [
-            "pihole-web",
-          ]
-        },
-      ]
-    }
-  }
-}
-
-
 # define the ingress for pihole web service
 resource "kubernetes_manifest" "pihole-web-networking" {
   manifest = {
