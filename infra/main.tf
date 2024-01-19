@@ -30,6 +30,18 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
 }
 
+###############
+# CONFIG VARS #
+###############
+
+variable "tailscale_client_id" {
+  type = string
+}
+
+variable "tailscale_client_secret" {
+  type = string
+}
+
 ###########
 # MODULES #
 ###########
@@ -51,4 +63,11 @@ module "cloudflare-module" {
 
 module "wireguard-module" {
     source = "./modules/wireguard"
+}
+
+module "tailscale-module" {
+  source = "./modules/tailscale"
+
+  tailscale_client_id = var.tailscale_client_id
+  tailscale_client_secret = var.tailscale_client_secret
 }
