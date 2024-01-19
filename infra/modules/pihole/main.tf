@@ -4,36 +4,39 @@ resource "kubernetes_namespace" "pihole-cloud" {
   }
 }
 
-# define the ingress for pihole DNS service
-resource "kubernetes_manifest" "pihole-networking" {
+# define the Tailscale ingress for funnel
+resource "kubernetes_manifest" "ingress_pihole_web" {
   manifest = {
-    apiVersion = "traefik.containo.us/v1alpha1"
-    kind       = "IngressRouteUDP"
-
-    metadata = {
-      name      = "pihole-external-dns"
-      namespace = "pihole-cloud"
+    "apiVersion" = "networking.k8s.io/v1"
+    "kind" = "Ingress"
+    "metadata" = {
+      "annotations" = {
+        "tailscale.com/funnel" = "true"
+      }
+      "name" = "pihole-web"
+      "namespace" = "pihole-cloud"
     }
-
-    spec = { 
-      entryPoints = [
-        "udp-dns"
-      ]
-
-      routes = [
-        {
-          services = [
-            {
-              name = "pihole-dns-udp"
-              namespace = "pihole-cloud"
-              port = 53 
-            }
-          ]
+    "spec" = {
+      "defaultBackend" = {
+        "service" = {
+          "name" = "pihole-web"
+          "port" = {
+            "number" = 80
+          }
         }
+      }
+      "ingressClassName" = "tailscale"
+      "tls" = [
+        {
+          "hosts" = [
+            "pihole-web",
+          ]
+        },
       ]
     }
   }
 }
+
 
 # define the ingress for pihole web service
 resource "kubernetes_manifest" "pihole-web-networking" {

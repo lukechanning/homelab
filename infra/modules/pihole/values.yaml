@@ -1,5 +1,8 @@
 adminPassword: "alleged pihole beret"
 
+DNS1: "1.1.1.1" 
+DNS2: "1.0.0.1" 
+
 serviceWeb:
   loadBalancerIP: 192.168.1.16
   type: LoadBalancer
@@ -8,15 +11,9 @@ serviceDns:
   loadBalancerIP: 192.168.1.15
   annotations:
     metallb.universe.tf/allow-shared-ip: "192.168.1.15"
+    tailscale.com/expose: "true"
   type: LoadBalancer
 
 persistentVolumeClaim:
   enabled: true
   storageClass: "longhorn"
-
-# podDnsConfig:
-#   enabled: true
-#   policy: "None"
-#   nameservers:
-#   - 1.1.1.1
-#   - 1.0.0.1
