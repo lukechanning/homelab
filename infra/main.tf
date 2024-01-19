@@ -29,14 +29,6 @@ module "pihole-module" {
     source = "./modules/pihole"
 }
 
-module "cloudflare-module" {
-    source = "./modules/cloudflare"
-}
-
-module "wireguard-module" {
-    source = "./modules/wireguard"
-}
-
 module "tailscale-module" {
   source = "./modules/tailscale"
 
