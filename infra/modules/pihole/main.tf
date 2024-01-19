@@ -4,39 +4,6 @@ resource "kubernetes_namespace" "pihole-cloud" {
   }
 }
 
-# define the ingress for pihole web service
-resource "kubernetes_manifest" "pihole-web-networking" {
-  manifest = {
-    apiVersion = "traefik.containo.us/v1alpha1"
-    kind       = "IngressRoute"
-
-    metadata = {
-      name      = "pihole-external-web"
-      namespace = "pihole-cloud"
-    }
-
-    spec = { 
-      entryPoints = [
-        "web"
-      ]
-
-      routes = [
-        {
-          match = "Host(`pihole`)"
-          kind = "Rule"
-          services = [
-            {
-              name = "pihole-web"
-              namespace = "pihole-cloud"
-              port = 80 
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-
 resource "helm_release" "pihole" {
   name       = "pihole"
   namespace  = "pihole-cloud"
