@@ -8,6 +8,31 @@ resource "kubernetes_namespace" "longhorn-system" {
   }
 }
 
+resource "kubernetes_service" "longhorn-secure" {
+  metadata {
+    name = "longhorn-secure"
+    namespace = "longhorn-system"
+    annotations = {
+      "tailscale.com/expose" = "true"
+      "tailscale.com/hostname" = "longhorncloud"
+    }
+  }
+
+  spec {
+    type = "LoadBalancer"
+
+    selector = {
+      app = "longhorn-ui"
+    }
+
+    port {
+      name = "http"
+      port = 80 
+      target_port = "http" 
+    }
+  }
+}
+
 resource "kubernetes_manifest" "longhorn-networking" {
   manifest = {
     apiVersion = "traefik.containo.us/v1alpha1"
