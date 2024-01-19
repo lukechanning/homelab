@@ -58,3 +58,41 @@ resource "kubernetes_manifest" "ingress_pihole_web" {
   }
 }
 ```
+
+## Traefik Ingress Routes
+
+Tunneling traffic locally to a service is really straightforward thanks to Traefik. The repo may or may not be doing this anywhere, but for quick reference, here's how to do it. This example uses the `longhorn-frontend` service as a sample:
+
+```
+resource "kubernetes_manifest" "longhorn-networking" {
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind       = "IngressRoute"
+
+    metadata = {
+      name      = "longhorn-ui"
+      namespace = "longhorn-system"
+    }
+
+    spec = { 
+      entryPoints = [
+        "web"
+      ]
+
+      routes = [
+        {
+          match = "Host(`longhorn`)"
+          kind = "Rule"
+          services = [
+            {
+              name = "longhorn-frontend"
+              namespace = "longhorn-system"
+              port = 80
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
