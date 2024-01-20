@@ -8,34 +8,28 @@ resource "kubernetes_namespace" "longhorn-system" {
   }
 }
 
-resource "kubernetes_manifest" "longhorn-networking" {
-  manifest = {
-    apiVersion = "traefik.containo.us/v1alpha1"
-    kind       = "IngressRoute"
+resource "kubernetes_service" "longhorn-secure" {
+  metadata {
+    name = "longhorn-secure"
+    namespace = "longhorn-system"
+    annotations = {
+      "metallb.universe.tf/ip-allocated-from-pool" = "first-pool"
+      "tailscale.com/expose" = "true"
+      "tailscale.com/hostname" = "longhorncloud"
+    }
+  }
 
-    metadata = {
-      name      = "longhorn-ui"
-      namespace = "longhorn-system"
+  spec {
+    type = "LoadBalancer"
+
+    selector = {
+      app = "longhorn-ui"
     }
 
-    spec = { 
-      entryPoints = [
-        "web"
-      ]
-
-      routes = [
-        {
-          match = "Host(`longhorn`)"
-          kind = "Rule"
-          services = [
-            {
-              name = "longhorn-frontend"
-              namespace = "longhorn-system"
-              port = 80
-            }
-          ]
-        }
-      ]
+    port {
+      name = "http"
+      port = 80 
+      target_port = "http" 
     }
   }
 }

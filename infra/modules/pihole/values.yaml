@@ -5,6 +5,9 @@ DNS2: "1.0.0.1"
 
 serviceWeb:
   loadBalancerIP: 192.168.1.16
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "piholecloud"
   type: LoadBalancer
 
 serviceDns:
